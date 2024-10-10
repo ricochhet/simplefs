@@ -80,7 +80,7 @@ linters:
         - gofumpt
         - goheader
         - goimports
-        # - gomoddirectives // ignore
+        - gomoddirectives
         - gomodguard
         - goprintffuncname
         - gosec
