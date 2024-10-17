@@ -2,6 +2,7 @@ package simplefs
 
 import (
 	"bufio"
+	"errors"
 	"io/fs"
 	"os"
 	"path"
@@ -10,6 +11,12 @@ import (
 	"strings"
 
 	"github.com/otiai10/copy"
+)
+
+var (
+	errNoNameFound = errors.New("name could not be found in file path")
+	errNoPathFound = errors.New("file path could not be found in file name")
+	errFileExists  = errors.New("file exists in destination path")
 )
 
 func Combine(path1 string, path2 ...string) string {
@@ -63,6 +70,42 @@ func TrimPath(input string) string {
 func Copy(a, b string) error {
 	if err := copy.Copy(a, b); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func CopyAndRename(src, dest, oldName, newName string) error {
+	files := GetFiles(src)
+	found := false
+
+	for _, file := range files {
+		if strings.Contains(file, oldName) {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return errNoNameFound
+	}
+
+	for _, file := range files {
+		newFileName := strings.ReplaceAll(file, oldName, newName)
+
+		if !strings.Contains(newFileName, TrimPath(src)) {
+			return errNoPathFound
+		}
+
+		newFilePath := strings.ReplaceAll(newFileName, TrimPath(src), dest)
+
+		if Exists(newFilePath) {
+			return errFileExists
+		}
+
+		if err := Copy(file, newFilePath); err != nil {
+			return err
+		}
 	}
 
 	return nil
