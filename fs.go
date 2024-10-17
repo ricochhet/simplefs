@@ -75,8 +75,7 @@ func Copy(a, b string) error {
 	return nil
 }
 
-func CopyAndRename(src, dest, oldName, newName string) error {
-	files := GetFiles(src)
+func CopyAndRename(files []string, oldPath, newPath, oldName, newName string) error {
 	found := false
 
 	for _, file := range files {
@@ -93,11 +92,11 @@ func CopyAndRename(src, dest, oldName, newName string) error {
 	for _, file := range files {
 		newFileName := strings.ReplaceAll(file, oldName, newName)
 
-		if !strings.Contains(newFileName, TrimPath(src)) {
+		if !strings.Contains(newFileName, TrimPath(oldPath)) {
 			return errNoPathFound
 		}
 
-		newFilePath := strings.ReplaceAll(newFileName, TrimPath(src), dest)
+		newFilePath := strings.ReplaceAll(newFileName, TrimPath(oldPath), newPath)
 
 		if Exists(newFilePath) {
 			return errFileExists
