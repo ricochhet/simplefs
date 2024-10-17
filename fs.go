@@ -51,9 +51,9 @@ func GetRelativePath(directories ...string) string {
 }
 
 func TrimPath(input string) string {
-	if strings.HasPrefix(input, "./") {
+	if strings.HasPrefix(input, "./") || strings.HasPrefix(input, ".\\") {
 		return input[2:]
-	} else if strings.HasPrefix(input, "/") {
+	} else if strings.HasPrefix(input, "/") || strings.HasPrefix(input, "\\") {
 		return input[1:]
 	}
 
