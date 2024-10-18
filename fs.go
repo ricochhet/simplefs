@@ -67,8 +67,8 @@ func TrimPath(input string) string {
 	return input
 }
 
-func Copy(a, b string) error {
-	if err := copy.Copy(a, b); err != nil {
+func Copy(a, b string, opts ...copy.Options) error {
+	if err := copy.Copy(a, b, opts...); err != nil {
 		return err
 	}
 
