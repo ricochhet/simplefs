@@ -190,6 +190,43 @@ func DeleteDirectory(fileName string) error {
 	return nil
 }
 
+func RemoveEmptyDirectories(root string) error {
+	dirs := []string{}
+
+	err := filepath.WalkDir(root, func(path string, dir os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if dir.IsDir() && path != root {
+			dirs = append(dirs, path)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	for i := len(dirs) - 1; i >= 0; i-- {
+		dir := dirs[i]
+
+		empty, err := IsEmpty(dir)
+		if err != nil {
+			return err
+		}
+
+		if empty {
+			err = os.Remove(dir)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func SortFileNames(files []string) []string {
 	sort.Slice(files, func(i, j int) bool {
 		parentA := filepath.Dir(files[i])
@@ -245,4 +282,24 @@ func GetDirectories(filePath string) []string {
 	}
 
 	return SortFileNames(directories)
+}
+
+func IsEmpty(dir string) (bool, error) {
+	file, err := os.Open(dir)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	_, err = file.Readdir(1)
+
+	if err == nil {
+		return false, nil
+	}
+
+	if errors.Is(err, os.ErrNotExist) || err.Error() == "EOF" {
+		return true, nil
+	}
+
+	return false, err
 }
