@@ -190,7 +190,7 @@ func DeleteDirectory(fileName string) error {
 	return nil
 }
 
-func RemoveEmptyDirectories(root string) error {
+func DeleteEmptyDirectories(root string) error {
 	dirs := []string{}
 
 	err := filepath.WalkDir(root, func(path string, dir os.DirEntry, err error) error {
